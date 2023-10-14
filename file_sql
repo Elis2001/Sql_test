@@ -4,16 +4,16 @@ as                                                                              
 set nocount on
 begin
 	declare @RowCount int = (select count(*) from syn.SA_CustomerSeasonal)                                         -- все переменные задаются в одном объявлении
-	declare @ErrorMessage varchar(max)                                                                             -- нет пробела перед скобками
+	declare @ErrorMessage varchar(max)                                                                            
                                                                                                                        -- 1 НЕПРАВИЛЬНАЯ КОДИРОВКА КОММЕНТАРИЕВ
--- Проверка на корректность загрузки
+-- Проверка на корректность загрузки                                                                                   -- комментарий не с таким же отступом как и блок                                                   
 	if not exists (                                                                                                -- в условных операторах конструкция смещается на один отступ
-	select 1
+	select 1                                                                                                       -- перечисление атрибутов должно быть с новой строки
 	from syn.ImportFile as f
 	where f.ID = @ID_Record
 		and f.FlagLoaded = cast(1 as bit)
 	)
-		begin
+		begin                                                                                                 -- if и begin должны быть на одном уровне                    
 			set @ErrorMessage = 'Ошибка при загрузке файла, проверьте корректность данных'
 
 			raiserror(@ErrorMessage, 3, 1)
@@ -62,7 +62,7 @@ begin
 		end as Reason
 	into #BadInsertedRows
 	from syn.SA_CustomerSeasonal as cs
-	left join dbo.Customer as cc on cc.UID_DS = cs.UID_DS_Customer
+	left join dbo.Customer as cc on cc.UID_DS = cs.UID_DS_Customer                                --- все виды join пишутся с одним отступом
 		and cc.ID_mapping_DataSource = 1
 	left join dbo.Customer as cd on cd.UID_DS = cs.UID_DS_CustomerDistributor and cd.ID_mapping_DataSource = 1
 	left join dbo.Season as s on s.Name = cs.Season
